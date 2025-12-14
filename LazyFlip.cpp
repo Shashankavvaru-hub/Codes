@@ -1,7 +1,7 @@
-class STMin {
+class ST {
 	vector<int> seg, lazy; 
 public: 
-	STMin(int n) {
+	ST(int n) {
 		seg.resize(4 * n); 
 		lazy.resize(4 * n); 
 	}
@@ -14,7 +14,7 @@ public:
 		int mid = (low + high) >> 1; 
 		build(2*ind+1, low, mid, arr); 
 		build(2*ind+2, mid+1, high, arr); 
-		seg[ind] = min(seg[2*ind+1], seg[2*ind+2]);
+		seg[ind] = seg[2*ind+1] + seg[2*ind+2];
 	}
 public:
 	void update(int ind, int low, int high, int l, int r, 
@@ -22,12 +22,12 @@ public:
 		// update the previous remaining updates 
 		// and propogate downwards 
 		if(lazy[ind] != 0) {
-			seg[ind] += lazy[ind]; 
+			seg[ind] = (high - low + 1) - seg[ind]; 
 			// propogate the lazy update downwards
 			// for the remaining nodes to get updated 
 			if(low != high) {
-				lazy[2*ind+1] += lazy[ind]; 
-				lazy[2*ind+2] += lazy[ind]; 
+				lazy[2*ind+1] = !lazy[2*ind + 1]; 
+				lazy[2*ind+2] = !lazy[2*ind + 2]; 
 			}
  
 			lazy[ind] = 0; 
@@ -43,11 +43,11 @@ public:
 		// complete overlap 
 		// l low high r 
 		if(low>=l && high <= r) {
-			seg[ind] += val; 
+			seg[ind] = (high - low + 1) - seg[ind]; 
 			// if a leaf node, it will have childrens
 			if(low != high) {
-				lazy[2*ind+1] += val; 
-				lazy[2*ind+2] += val; 
+				lazy[2*ind+1] = !lazy[2*ind + 1]; 
+				lazy[2*ind+2] = !lazy[2*ind + 2]; 
 			}
 			return; 
 		}
@@ -55,7 +55,7 @@ public:
 		int mid = (low + high) >> 1; 
 		update(2*ind+1, low, mid, l, r, val);
 		update(2*ind+2, mid+1, high, l, r, val); 
-		seg[ind] = min(seg[2*ind+1], seg[2*ind+2]); 
+		seg[ind] = seg[2*ind+1] + seg[2*ind+2]; 
 	}
 public: 
 	int query(int ind, int low, int high, int l, int r) {
@@ -63,12 +63,12 @@ public:
 		// update if any updates are remaining 
 		// as the node will stay fresh and updated 
 		if(lazy[ind] != 0) {
-			seg[ind] += lazy[ind]; 
+			seg[ind] = (high - low + 1) - seg[ind]; 
 			// propogate the lazy update downwards
 			// for the remaining nodes to get updated 
 			if(low != high) {
-				lazy[2*ind+1] += lazy[ind]; 
-				lazy[2*ind+2] += lazy[ind]; 
+				lazy[2*ind+1] = !lazy[2*ind + 1]; 
+				lazy[2*ind+2] = !lazy[2*ind + 2]; 
 			}
  
 			lazy[ind] = 0; 
@@ -76,7 +76,7 @@ public:
  
 		// no overlap return 0; 
 		if(high < l or r < low) {
-			return INT_MAX; 
+			return 0; 
 		}
  
 		// complete overlap 
@@ -85,6 +85,6 @@ public:
 		int mid = (low + high) >> 1; 
 		int left = query(2*ind+1, low, mid, l, r);
 		int right = query(2*ind+2, mid+1, high, l, r);
-		return min(left,right); 
+		return left + right; 
 	}
 };
