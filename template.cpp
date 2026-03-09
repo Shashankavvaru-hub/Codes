@@ -17,6 +17,18 @@ using namespace std;
 const ll INF = 1e18;
 const int MOD = 1e9 + 7;
 
+// Modular exponentiation or Binary exponentiation
+ll modPow(ll base, ll exp){
+    ll res = 1;
+    base %= MOD;
+    while(exp){
+        if(exp & 1) res = (res * base) % MOD;
+        base = (base * base) % MOD;
+        exp >>= 1;
+    }
+    return res;
+}
+
 /* --------------- Debug (optional) ------ */
 // Uncomment when debugging locally
 // #define debug(x) cerr << #x << " = " << x << '\n'
